@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { ETFEngine } from "@/lib/types";
+import { formatCurrencyTable } from "@/lib/formatCurrency";
 import { Search, ArrowUpDown, Plus, Trash2, Edit2, ArrowUp, ArrowDown, X } from "lucide-react";
 
 interface ETFManagementSectionProps {
@@ -205,13 +206,13 @@ export function ETFManagementSection({ engines }: ETFManagementSectionProps) {
                       {engine.shares.toFixed(2)}
                     </td>
                     <td className="px-4 py-3 text-cyan-300/80 font-mono">
-                      ${engine.currentValue.toFixed(2)}
+                      {formatCurrencyTable(engine.currentValue)}
                     </td>
                     <td className="px-4 py-3 text-cyan-300/80 font-mono">
-                      ${monthlyIncome.toFixed(2)}
+                      {formatCurrencyTable(monthlyIncome)}
                     </td>
                     <td className="px-4 py-3 text-cyan-300/80 font-mono">
-                      ${dividendYield.toFixed(2)}
+                      {formatCurrencyTable(dividendYield)}
                     </td>
                     <td className="px-4 py-3 text-cyan-300/80 font-mono">
                       {dividendYieldPercent.toFixed(2)}%

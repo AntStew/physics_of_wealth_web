@@ -1,8 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
+import dynamic from "next/dynamic";
 import { ETFEngine, EngineType } from "@/lib/types";
-import { FlightPathSidebar, ProjectionChart, ProjectionMetrics, useFlightPathProjection } from "./flight-path";
+import { FlightPathSidebar, ProjectionMetrics, useFlightPathProjection } from "./flight-path";
+
+// Lazy load Recharts component to reduce initial bundle size
+const ProjectionChart = dynamic(
+  () => import("./flight-path/components/ProjectionChart").then(mod => ({ default: mod.ProjectionChart })),
+  {
+    loading: () => (
+      <div className="relative bg-black/40 border border-cyan-500/30 rounded-lg p-6 backdrop-blur-sm flex flex-col h-full">
+        <div className="animate-pulse">
+          <div className="h-96 bg-zinc-800/50 rounded"></div>
+        </div>
+      </div>
+    ),
+    ssr: false,
+  }
+);
 
 interface FlightPathViewProps {
   engines: ETFEngine[];
@@ -68,7 +84,15 @@ export function FlightPathView({ engines }: FlightPathViewProps) {
         <div className="md:ml-80 min-h-[600px]">
           <ProjectionMetrics projection={projection} />
           <div className="h-[600px] mt-4">
-            <ProjectionChart chartData={chartData} engineType={engineType} />
+            <Suspense fallback={
+              <div className="relative bg-black/40 border border-cyan-500/30 rounded-lg p-6 backdrop-blur-sm flex flex-col h-full">
+                <div className="animate-pulse">
+                  <div className="h-96 bg-zinc-800/50 rounded"></div>
+                </div>
+              </div>
+            }>
+              <ProjectionChart chartData={chartData} engineType={engineType} />
+            </Suspense>
           </div>
         </div>
       </div>

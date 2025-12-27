@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { ETFEngine } from "@/lib/types";
 import { filterEngines, generateDividendYield } from "@/lib/dataTransform";
 import { Search, ArrowUp, ArrowDown } from "lucide-react";
+import { formatCurrencyTable } from "@/lib/formatCurrency";
 
 interface EngineDatabaseProps {
   engines: ETFEngine[];
@@ -145,22 +146,21 @@ export function EngineDatabase({ engines }: EngineDatabaseProps) {
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto overflow-y-auto max-h-[600px] scrollbar-cyan">
-        <div className="relative bg-gradient-to-br from-slate-900/95 via-black/95 to-slate-900/95 backdrop-blur-2xl rounded-2xl border-2 border-cyan-500/40 shadow-[0_0_50px_rgba(6,182,212,0.3),inset_0_0_50px_rgba(6,182,212,0.1)] overflow-hidden">
-          {/* Hexagonal Pattern Overlay */}
-          <div className="absolute inset-0 opacity-10" style={{
-            backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(6,182,212,0.1) 2px, rgba(6,182,212,0.1) 4px),
-                             repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(6,182,212,0.1) 2px, rgba(6,182,212,0.1) 4px)`,
-            backgroundSize: '40px 40px'
-          }}></div>
-          {/* Corner Accents */}
-          <div className="absolute top-0 left-0 w-20 h-20 border-t-2 border-l-2 border-cyan-400/60"></div>
-          <div className="absolute top-0 right-0 w-20 h-20 border-t-2 border-r-2 border-cyan-400/60"></div>
-          <div className="absolute bottom-0 left-0 w-20 h-20 border-b-2 border-l-2 border-cyan-400/60"></div>
-          <div className="absolute bottom-0 right-0 w-20 h-20 border-b-2 border-r-2 border-cyan-400/60"></div>
-          <div className="relative">
-            <table className="w-full border-collapse">
-              <thead className="sticky top-0 z-10">
+      <div className="relative bg-gradient-to-br from-slate-900/95 via-black/95 to-slate-900/95 backdrop-blur-2xl rounded-2xl border-2 border-cyan-500/40 shadow-[0_0_50px_rgba(6,182,212,0.3),inset_0_0_50px_rgba(6,182,212,0.1)] overflow-hidden">
+        {/* Hexagonal Pattern Overlay */}
+        <div className="absolute inset-0 opacity-10" style={{
+          backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(6,182,212,0.1) 2px, rgba(6,182,212,0.1) 4px),
+                           repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(6,182,212,0.1) 2px, rgba(6,182,212,0.1) 4px)`,
+          backgroundSize: '40px 40px'
+        }}></div>
+        {/* Corner Accents */}
+        <div className="absolute top-0 left-0 w-20 h-20 border-t-2 border-l-2 border-cyan-400/60"></div>
+        <div className="absolute top-0 right-0 w-20 h-20 border-t-2 border-r-2 border-cyan-400/60"></div>
+        <div className="absolute bottom-0 left-0 w-20 h-20 border-b-2 border-l-2 border-cyan-400/60"></div>
+        <div className="absolute bottom-0 right-0 w-20 h-20 border-b-2 border-r-2 border-cyan-400/60"></div>
+        <div className="overflow-x-auto overflow-y-auto max-h-[600px] relative">
+          <table className="w-full border-collapse" style={{ minWidth: 'max-content' }}>
+            <thead className="sticky top-0 z-20">
                 <tr className="bg-gradient-to-br from-slate-900/98 via-black/98 to-slate-900/98 backdrop-blur-sm border-b border-cyan-500/30">
               <th className="px-4 py-3 text-left">
                 <div className="flex items-center text-cyan-300/70">
@@ -224,7 +224,7 @@ export function EngineDatabase({ engines }: EngineDatabaseProps) {
               </th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="relative">
                 {sortedEngines.map((engine, index) => (
                   <tr
                     key={`${engine.ticker}-${index}`}
@@ -236,9 +236,9 @@ export function EngineDatabase({ engines }: EngineDatabaseProps) {
                     <td className="px-4 py-3 text-cyan-300/80">{engine.engineType || "N/A"}</td>
                     <td className="px-4 py-3 text-cyan-300/80 font-mono uppercase">{engine.frequency}</td>
                     <td className="px-4 py-3 text-cyan-300/80 font-mono">{engine.shares.toFixed(3)}</td>
-                    <td className="px-4 py-3 text-cyan-300/80 font-mono">${engine.currentValue.toFixed(2)}</td>
+                    <td className="px-4 py-3 text-cyan-300/80 font-mono">{formatCurrencyTable(engine.currentValue)}</td>
                     <td className="px-4 py-3 font-medium text-cyan-300/80 font-mono">
-                      ${engine.yearlyThrust.toFixed(2)}
+                      {formatCurrencyTable(engine.yearlyThrust)}
                     </td>
                     <td className="px-4 py-3 font-medium text-cyan-400 font-mono">
                       {(engine as any).dividendYield?.toFixed(2) || '0.00'}%
@@ -250,7 +250,6 @@ export function EngineDatabase({ engines }: EngineDatabaseProps) {
                 ))}
               </tbody>
             </table>
-          </div>
         </div>
       </div>
     </section>

@@ -1,4 +1,5 @@
 import { Transaction } from "../utils/transactionGenerator";
+import { formatCurrencyTable } from "@/lib/formatCurrency";
 
 interface TransactionLogProps {
   transactions: Transaction[];
@@ -58,12 +59,12 @@ export function TransactionLog({ transactions }: TransactionLogProps) {
                       {transaction.shares !== null ? transaction.shares.toFixed(3) : "—"}
                     </td>
                     <td className="px-4 py-3 text-cyan-300/80 font-mono text-sm text-right">
-                      {transaction.price !== null ? `$${transaction.price.toFixed(2)}` : "—"}
+                      {transaction.price !== null ? formatCurrencyTable(transaction.price) : "—"}
                     </td>
                     <td className={`px-4 py-3 font-mono text-sm text-right font-bold ${
                       transaction.type === "BUY" ? "text-red-400" : "text-green-400"
                     }`}>
-                      {transaction.type === "BUY" ? "-" : "+"}${transaction.amount.toFixed(2)}
+                      {transaction.type === "BUY" ? "-" : "+"}{formatCurrencyTable(transaction.amount)}
                     </td>
                   </tr>
                 );

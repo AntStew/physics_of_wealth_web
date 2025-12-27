@@ -2,6 +2,7 @@
 
 import { InfoTooltip } from "./InfoTooltip";
 import { METRIC_DESCRIPTIONS, getClassification } from "../utils/metrics";
+import { formatCurrency } from "@/lib/formatCurrency";
 
 interface FinancialPerformanceSectionProps {
   incomePerMonth: number;
@@ -45,8 +46,8 @@ export function FinancialPerformanceSection({
             {METRIC_DESCRIPTIONS["income-per-month"]}
           </div>
         )}
-        <div className="text-4xl font-bold text-purple-400 font-mono mb-2">${incomePerMonth.toFixed(2)}</div>
-        <div className="text-xs text-purple-300/60 font-mono">YEARLY: ${totalYearlyThrust.toFixed(2)}</div>
+        <div className="text-4xl font-bold text-purple-400 font-mono mb-2">{formatCurrency(incomePerMonth)}</div>
+        <div className="text-xs text-purple-300/60 font-mono">YEARLY: {formatCurrency(totalYearlyThrust)}</div>
       </div>
 
       {/* Portfolio Value */}
@@ -64,7 +65,7 @@ export function FinancialPerformanceSection({
             {METRIC_DESCRIPTIONS["total-value"]}
           </div>
         )}
-        <div className="text-4xl font-bold text-teal-400 font-mono mb-2">${totalValue.toFixed(2)}</div>
+        <div className="text-4xl font-bold text-teal-400 font-mono mb-2">{formatCurrency(totalValue)}</div>
         <div className="text-xs text-teal-300/60 font-mono">ACTIVE ENGINES: {enginesCount}</div>
       </div>
 

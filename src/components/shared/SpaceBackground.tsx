@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 
-export function SpaceBackground() {
+function SpaceBackgroundComponent() {
   // Generate stars with more variety
   const generateStars = (count: number, sizeRange: [number, number], opacityRange: [number, number]) => {
     return Array.from({ length: count }).map((_, i) => {
@@ -31,7 +31,7 @@ export function SpaceBackground() {
   };
 
   const generateClusters = () => {
-    return Array.from({ length: 8 }).map((_, i) => {
+    return Array.from({ length: 5 }).map((_, i) => {
       const left = Math.random() * 100;
       const top = Math.random() * 100;
       const size = 200 + Math.random() * 300;
@@ -53,11 +53,12 @@ export function SpaceBackground() {
 
   useEffect(() => {
     // Generate random values only on client side after mount
+    // Reduced star counts for better performance (250 total vs 510)
     setIsMounted(true);
-    setBrightStars(generateStars(30, [1.5, 3], [0.7, 1]));
-    setMediumStars(generateStars(80, [0.8, 1.5], [0.4, 0.7]));
-    setSmallStars(generateStars(250, [0.3, 0.8], [0.2, 0.5]));
-    setDistantStars(generateStars(150, [0.2, 0.5], [0.1, 0.3]));
+    setBrightStars(generateStars(20, [1.5, 3], [0.7, 1]));
+    setMediumStars(generateStars(50, [0.8, 1.5], [0.4, 0.7]));
+    setSmallStars(generateStars(100, [0.3, 0.8], [0.2, 0.5]));
+    setDistantStars(generateStars(80, [0.2, 0.5], [0.1, 0.3]));
     setClusters(generateClusters());
   }, []);
 
@@ -109,6 +110,7 @@ export function SpaceBackground() {
                 opacity: star.opacity,
                 animation: `twinkle ${star.duration}s ease-in-out ${star.delay}s infinite`,
                 boxShadow: `0 0 ${star.size}px ${star.color}`,
+                willChange: 'opacity, transform',
               }}
             />
           ))}
@@ -127,6 +129,7 @@ export function SpaceBackground() {
                 opacity: star.opacity,
                 animation: `twinkle ${star.duration}s ease-in-out ${star.delay}s infinite`,
                 boxShadow: `0 0 ${star.size * 1.5}px ${star.color}`,
+                willChange: 'opacity, transform',
               }}
             />
           ))}
@@ -145,6 +148,7 @@ export function SpaceBackground() {
                 opacity: star.opacity,
                 animation: `twinkle ${star.duration}s ease-in-out ${star.delay}s infinite`,
                 boxShadow: `0 0 ${star.size * 2}px ${star.color}, 0 0 ${star.size * 4}px ${star.color}40`,
+                willChange: 'opacity, transform',
               }}
             />
           ))}
@@ -167,6 +171,7 @@ export function SpaceBackground() {
                   0 0 ${star.size * 4}px ${star.color}80,
                   0 0 ${star.size * 6}px ${star.color}40
                 `,
+                willChange: 'opacity, transform',
               }}
             />
           ))}
@@ -214,3 +219,5 @@ export function SpaceBackground() {
     </div>
   );
 }
+
+export const SpaceBackground = memo(SpaceBackgroundComponent);

@@ -1,14 +1,29 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, Suspense } from "react";
+import dynamic from "next/dynamic";
 import { ETFEngine } from "@/lib/types";
 import { TimePeriod } from "./flight-log/constants";
 import { useFlightLogCalculations } from "./flight-log/hooks/useFlightLogCalculations";
 import { generateFakeTransactions } from "./flight-log/utils/transactionGenerator";
 import { TimePeriodToggle } from "./flight-log/components/TimePeriodToggle";
 import { MetricsGrid } from "./flight-log/components/MetricsGrid";
-import { PortfolioChart } from "./flight-log/components/PortfolioChart";
 import { TransactionLog } from "./flight-log/components/TransactionLog";
+
+// Lazy load Recharts component to reduce initial bundle size
+const PortfolioChart = dynamic(
+  () => import("./flight-log/components/PortfolioChart").then(mod => ({ default: mod.PortfolioChart })),
+  {
+    loading: () => (
+      <div className="relative bg-black/40 border border-cyan-500/30 rounded-lg p-6 backdrop-blur-sm">
+        <div className="animate-pulse">
+          <div className="h-96 bg-zinc-800/50 rounded"></div>
+        </div>
+      </div>
+    ),
+    ssr: false,
+  }
+);
 
 interface FlightLogViewProps {
   engines: ETFEngine[];
@@ -62,10 +77,18 @@ export function FlightLogView({ engines }: FlightLogViewProps) {
       />
 
       {/* Portfolio Value Chart */}
-      <PortfolioChart 
-        chartData={chartData} 
-        monthsPast={selectedPeriod.monthsPast} 
-      />
+      <Suspense fallback={
+        <div className="relative bg-black/40 border border-cyan-500/30 rounded-lg p-6 backdrop-blur-sm">
+          <div className="animate-pulse">
+            <div className="h-96 bg-zinc-800/50 rounded"></div>
+          </div>
+        </div>
+      }>
+        <PortfolioChart 
+          chartData={chartData} 
+          monthsPast={selectedPeriod.monthsPast} 
+        />
+      </Suspense>
 
       {/* Transaction Log */}
       <TransactionLog transactions={transactions} />

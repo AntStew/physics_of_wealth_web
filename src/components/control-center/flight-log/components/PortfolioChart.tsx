@@ -1,4 +1,5 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { formatCurrencyChart } from "@/lib/formatCurrency";
 
 interface PortfolioChartProps {
   chartData: Array<{
@@ -29,7 +30,7 @@ export function PortfolioChart({ chartData, monthsPast }: PortfolioChartProps) {
           <YAxis
             stroke="#9ca3af"
             tick={{ fill: "#9ca3af", fontSize: 12 }}
-            tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+            tickFormatter={(value) => formatCurrencyChart(value)}
           />
           <Tooltip
             contentStyle={{
@@ -37,7 +38,7 @@ export function PortfolioChart({ chartData, monthsPast }: PortfolioChartProps) {
               border: "1px solid #374151",
               borderRadius: "8px",
             }}
-            formatter={(value: number | undefined) => value !== undefined ? `$${value.toFixed(2)}` : "$0.00"}
+            formatter={(value: number | undefined) => value !== undefined ? formatCurrencyChart(value) : "$0"}
           />
           <Legend 
             wrapperStyle={{ paddingTop: "20px" }}

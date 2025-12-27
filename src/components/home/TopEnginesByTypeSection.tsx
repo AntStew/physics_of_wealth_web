@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { ETFEngine, EngineType } from "@/lib/types";
 import { groupEnginesByType, generateDividendYield } from "@/lib/dataTransform";
 import { getEngineTypeCharacteristics } from "@/lib/calculations";
+import { formatCurrencyTable } from "@/lib/formatCurrency";
 
 interface TopEnginesByTypeSectionProps {
   engines: ETFEngine[];
@@ -173,7 +174,7 @@ export function TopEnginesByTypeSection({ engines }: TopEnginesByTypeSectionProp
                           </div>
                           <div>
                             <div className="text-sm font-bold text-cyan-400 font-mono">
-                              ${engine.currentValue.toFixed(2)}
+                              {formatCurrencyTable(engine.currentValue)}
                             </div>
                             <div className="text-xs text-cyan-300/60">Value</div>
                           </div>
@@ -198,7 +199,7 @@ export function TopEnginesByTypeSection({ engines }: TopEnginesByTypeSectionProp
                       <div className="grid grid-cols-2 gap-3 text-xs">
                         <div>
                           <div className="text-cyan-300/60 mb-1">Yearly Thrust</div>
-                          <div className="text-cyan-300/80 font-semibold font-mono">${engine.yearlyThrust.toFixed(2)}</div>
+                          <div className="text-cyan-300/80 font-semibold font-mono">{formatCurrencyTable(engine.yearlyThrust)}</div>
                         </div>
                         <div>
                           <div className="text-cyan-300/60 mb-1">Frequency</div>

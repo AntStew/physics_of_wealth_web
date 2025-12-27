@@ -1,5 +1,6 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { EngineType } from "@/lib/types";
+import { formatCurrencyChart } from "@/lib/formatCurrency";
 
 interface ProjectionChartProps {
   chartData: Array<{
@@ -33,7 +34,7 @@ export function ProjectionChart({ chartData, engineType }: ProjectionChartProps)
             <YAxis
               stroke="#9ca3af"
               tick={{ fill: "#9ca3af", fontSize: 12 }}
-              tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+              tickFormatter={(value) => formatCurrencyChart(value)}
             />
             <Tooltip
               contentStyle={{
@@ -42,7 +43,7 @@ export function ProjectionChart({ chartData, engineType }: ProjectionChartProps)
                 borderRadius: "8px",
               }}
               formatter={(value: number | undefined) => 
-                value !== undefined ? `$${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}` : "$0"
+                value !== undefined ? formatCurrencyChart(value) : "$0"
               }
             />
             <Legend 

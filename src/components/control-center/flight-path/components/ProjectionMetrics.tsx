@@ -1,5 +1,6 @@
 import { Target, DollarSign, TrendingUp, Wallet } from "lucide-react";
 import { VolatileProjectionData } from "@/lib/calculations";
+import { formatCurrency } from "@/lib/formatCurrency";
 
 interface ProjectionMetricsProps {
   projection: VolatileProjectionData;
@@ -64,7 +65,7 @@ export function ProjectionMetrics({ projection }: ProjectionMetricsProps) {
           </h3>
         </div>
         <div className="text-2xl md:text-3xl font-bold text-cyan-300 mb-1">
-          ${(moneyInvested / 1000).toFixed(0)}k
+          {formatCurrency(moneyInvested)}
         </div>
         <div className="text-xs text-cyan-300/60">
           ${moneyInvested.toLocaleString(undefined, { maximumFractionDigits: 0 })}
@@ -82,7 +83,7 @@ export function ProjectionMetrics({ projection }: ProjectionMetricsProps) {
           </h3>
         </div>
         <div className="text-2xl md:text-3xl font-bold text-cyan-300 mb-1">
-          ${(incomeGained / 1000).toFixed(0)}k
+          {formatCurrency(incomeGained)}
         </div>
         <div className="text-xs text-cyan-300/60">
           {totalGrowthPercent}% total growth
@@ -100,7 +101,7 @@ export function ProjectionMetrics({ projection }: ProjectionMetricsProps) {
           </h3>
         </div>
         <div className="text-2xl md:text-3xl font-bold text-cyan-300 mb-1">
-          ${(valueAtGoal / 1000).toFixed(0)}k
+          {formatCurrency(valueAtGoal)}
         </div>
         <div className="text-xs text-cyan-300/60">
           {projection.yearsToGoal !== null 

@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { ETFEngine } from "@/lib/types";
 import { RocketshipView } from "./RocketshipView";
 import { FlightLogView } from "./FlightLogView";
@@ -12,7 +13,7 @@ interface ControlCenterViewProps {
   activeTab: ControlTabType;
 }
 
-export function ControlCenterView({ engines, activeTab }: ControlCenterViewProps) {
+function ControlCenterViewComponent({ engines, activeTab }: ControlCenterViewProps) {
   return (
     <div className="w-full">
       {/* Tab Content */}
@@ -24,4 +25,6 @@ export function ControlCenterView({ engines, activeTab }: ControlCenterViewProps
     </div>
   );
 }
+
+export const ControlCenterView = memo(ControlCenterViewComponent);
 

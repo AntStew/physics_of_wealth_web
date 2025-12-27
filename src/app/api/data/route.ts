@@ -13,7 +13,11 @@ export async function GET() {
     // Check cache
     const now = Date.now();
     if (cachedData && (now - cacheTime) < CACHE_DURATION) {
-      return NextResponse.json(cachedData);
+      return NextResponse.json(cachedData, {
+        headers: {
+          'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+        },
+      });
     }
     
     // Get the Excel file path
@@ -23,7 +27,12 @@ export async function GET() {
     if (!fs.existsSync(excelPath)) {
       return NextResponse.json(
         { error: "Excel file not found" },
-        { status: 404 }
+        { 
+          status: 404,
+          headers: {
+            'Cache-Control': 'no-cache',
+          },
+        }
       );
     }
     
@@ -34,12 +43,21 @@ export async function GET() {
     cachedData = { engines };
     cacheTime = now;
     
-    return NextResponse.json({ engines });
+    return NextResponse.json({ engines }, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+      },
+    });
   } catch (error) {
     console.error("Error reading Excel file:", error);
     return NextResponse.json(
       { error: "Failed to read Excel file", details: error instanceof Error ? error.message : "Unknown error" },
-      { status: 500 }
+      { 
+        status: 500,
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+      }
     );
   }
 }

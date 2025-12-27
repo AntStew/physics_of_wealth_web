@@ -1,10 +1,33 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, Suspense } from "react";
+import dynamic from "next/dynamic";
+import Image from "next/image";
 import { ETFEngine } from "@/lib/types";
 import { Header } from "@/components/shared/Header";
-import { HomeView } from "@/components/home/HomeView";
-import { ControlCenterView } from "@/components/control-center/ControlCenterView";
+
+// Lazy load route components for code splitting
+const HomeView = dynamic(() => import("@/components/home/HomeView").then(mod => ({ default: mod.HomeView })), {
+  loading: () => (
+    <div className="w-full max-w-7xl mx-auto">
+      <div className="animate-pulse space-y-8">
+        <div className="h-64 bg-zinc-800/50 rounded-lg"></div>
+        <div className="h-96 bg-zinc-800/50 rounded-lg"></div>
+      </div>
+    </div>
+  ),
+});
+
+const ControlCenterView = dynamic(() => import("@/components/control-center/ControlCenterView").then(mod => ({ default: mod.ControlCenterView })), {
+  loading: () => (
+    <div className="w-full py-8">
+      <div className="animate-pulse space-y-8">
+        <div className="h-64 bg-zinc-800/50 rounded-lg"></div>
+        <div className="h-96 bg-zinc-800/50 rounded-lg"></div>
+      </div>
+    </div>
+  ),
+});
 
 type MainTabType = "home" | "control-center";
 type BookmarkType = "news" | "definitions" | "top-performers" | "database";
@@ -45,31 +68,47 @@ export default function Home() {
     fetchData();
   }, []);
 
-  // Track active bookmark based on scroll position
+  // Track active bookmark based on scroll position (throttled with requestAnimationFrame)
+  const rafIdRef = useRef<number | null>(null);
+  
   useEffect(() => {
     if (activeTab !== "home") return;
 
     const handleScroll = () => {
-      const sections: BookmarkType[] = ["news", "definitions", "top-performers", "database"];
-      const scrollPosition = window.scrollY + 150; // Offset for header
+      // Cancel any pending animation frame
+      if (rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current);
+      }
 
-      for (let i = sections.length - 1; i >= 0; i--) {
-        const section = document.getElementById(sections[i]);
-        if (section) {
-          const sectionTop = section.offsetTop;
-          if (scrollPosition >= sectionTop) {
-            setActiveBookmark(sections[i]);
-            return;
+      // Schedule scroll handling on next animation frame
+      rafIdRef.current = requestAnimationFrame(() => {
+        const sections: BookmarkType[] = ["news", "definitions", "top-performers", "database"];
+        const scrollPosition = window.scrollY + 150; // Offset for header
+
+        for (let i = sections.length - 1; i >= 0; i--) {
+          const section = document.getElementById(sections[i]);
+          if (section) {
+            const sectionTop = section.offsetTop;
+            if (scrollPosition >= sectionTop) {
+              setActiveBookmark(sections[i]);
+              return;
+            }
           }
         }
-      }
-      setActiveBookmark(null);
+        setActiveBookmark(null);
+        rafIdRef.current = null;
+      });
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll(); // Check on mount
 
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current);
+      }
+    };
   }, [activeTab]);
 
   if (loading) {
@@ -135,12 +174,15 @@ export default function Home() {
               {/* Large Featured Article */}
               <article 
                 className="group relative w-full md:col-span-2 lg:col-span-2 h-80 rounded-lg overflow-hidden border border-white/20 shadow-[0_8px_16px_rgba(0,0,0,0.3)] hover:shadow-[0_12px_24px_rgba(0,0,0,0.5)] hover:border-white/30 transition-all duration-300 cursor-pointer"
-                style={{
-                  backgroundImage: 'url(/news_images/f1.jpg)',
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center'
-                }}
               >
+                <Image
+                  src="/news_images/f1.jpg"
+                  alt="Revolutionary ETF Classification System"
+                  fill
+                  className="object-cover"
+                  priority
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 66vw, 66vw"
+                />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent group-hover:from-black/95 group-hover:via-black/80 group-hover:to-black/60 transition-all duration-300"></div>
                 <div className="relative h-full flex flex-col justify-end p-6">
                   <div className="absolute top-4 left-4 text-xs text-white font-bold bg-blue-500/90 backdrop-blur-sm px-3 py-1 rounded-full uppercase tracking-wider">Featured</div>
@@ -155,12 +197,15 @@ export default function Home() {
               {/* Medium Article 1 */}
               <article 
                 className="group relative w-full h-80 rounded-lg overflow-hidden border border-white/20 shadow-[0_8px_16px_rgba(0,0,0,0.3)] hover:shadow-[0_12px_24px_rgba(0,0,0,0.5)] hover:border-white/30 transition-all duration-300 cursor-pointer"
-                style={{
-                  backgroundImage: 'url(/news_images/f2.jpg)',
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center'
-                }}
               >
+                <Image
+                  src="/news_images/f2.jpg"
+                  alt="Nuclear Propulsion ETFs See Record Inflows"
+                  fill
+                  className="object-cover"
+                  priority
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 33vw, 33vw"
+                />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent group-hover:from-black/95 group-hover:via-black/80 group-hover:to-black/60 transition-all duration-300"></div>
                 <div className="relative h-full flex flex-col justify-end p-5">
                   <div className="absolute top-4 left-4 text-xs text-white font-bold bg-blue-500/90 backdrop-blur-sm px-3 py-1 rounded-full uppercase tracking-wider">Featured</div>
@@ -175,12 +220,15 @@ export default function Home() {
               {/* Medium Article 2 */}
               <article 
                 className="group relative w-full h-64 rounded-lg overflow-hidden border border-white/20 shadow-[0_8px_16px_rgba(0,0,0,0.3)] hover:shadow-[0_12px_24px_rgba(0,0,0,0.5)] hover:border-white/30 transition-all duration-300 cursor-pointer"
-                style={{
-                  backgroundImage: 'url(/news_images/f3.jpg)',
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center'
-                }}
               >
+                <Image
+                  src="/news_images/f3.jpg"
+                  alt="Elite Propulsion Funds Maintain Strong Performance"
+                  fill
+                  className="object-cover"
+                  loading="lazy"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 33vw, 33vw"
+                />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent group-hover:from-black/95 group-hover:via-black/80 group-hover:to-black/60 transition-all duration-300"></div>
                 <div className="relative h-full flex flex-col justify-end p-5">
                   <div className="absolute top-4 right-4 text-xs text-white/80 font-medium bg-black/40 backdrop-blur-sm px-2 py-1 rounded">1d ago</div>
@@ -194,12 +242,15 @@ export default function Home() {
               {/* Small Article 1 */}
               <article 
                 className="group relative w-full h-64 rounded-lg overflow-hidden border border-white/20 shadow-[0_8px_16px_rgba(0,0,0,0.3)] hover:shadow-[0_12px_24px_rgba(0,0,0,0.5)] hover:border-white/30 transition-all duration-300 cursor-pointer"
-                style={{
-                  backgroundImage: 'url(/news_images/f4.jpg)',
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center'
-                }}
               >
+                <Image
+                  src="/news_images/f4.jpg"
+                  alt="Stabilized Engines Gain Traction"
+                  fill
+                  className="object-cover"
+                  loading="lazy"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 33vw, 33vw"
+                />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent group-hover:from-black/95 group-hover:via-black/80 group-hover:to-black/60 transition-all duration-300"></div>
                 <div className="relative h-full flex flex-col justify-end p-4">
                   <div className="absolute top-4 right-4 text-xs text-white/80 font-medium bg-black/40 backdrop-blur-sm px-2 py-1 rounded">2d ago</div>
@@ -213,12 +264,15 @@ export default function Home() {
               {/* Small Article 2 */}
               <article 
                 className="group relative w-full h-64 rounded-lg overflow-hidden border border-white/20 shadow-[0_8px_16px_rgba(0,0,0,0.3)] hover:shadow-[0_12px_24px_rgba(0,0,0,0.5)] hover:border-white/30 transition-all duration-300 cursor-pointer"
-                style={{
-                  backgroundImage: 'url(/news_images/f5.jpg)',
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center'
-                }}
               >
+                <Image
+                  src="/news_images/f5.jpg"
+                  alt="Escape Ratio Metrics Reshape Analysis"
+                  fill
+                  className="object-cover"
+                  loading="lazy"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 33vw, 33vw"
+                />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent group-hover:from-black/95 group-hover:via-black/80 group-hover:to-black/60 transition-all duration-300"></div>
                 <div className="relative h-full flex flex-col justify-end p-4">
                   <div className="absolute top-4 right-4 text-xs text-white/80 font-medium bg-black/40 backdrop-blur-sm px-2 py-1 rounded">3d ago</div>
@@ -232,12 +286,15 @@ export default function Home() {
               {/* Medium Article 3 */}
               <article 
                 className="group relative w-full md:col-span-2 h-64 rounded-lg overflow-hidden border border-white/20 shadow-[0_8px_16px_rgba(0,0,0,0.3)] hover:shadow-[0_12px_24px_rgba(0,0,0,0.5)] hover:border-white/30 transition-all duration-300 cursor-pointer"
-                style={{
-                  backgroundImage: 'url(/news_images/f6.jpg)',
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center'
-                }}
               >
+                <Image
+                  src="/news_images/f6.jpg"
+                  alt="Distribution Stability Index Becomes Key Selection Criterion"
+                  fill
+                  className="object-cover"
+                  loading="lazy"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 66vw, 66vw"
+                />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent group-hover:from-black/95 group-hover:via-black/80 group-hover:to-black/60 transition-all duration-300"></div>
                 <div className="relative h-full flex flex-col justify-end p-5">
                   <div className="absolute top-4 left-4 text-xs text-white font-bold bg-blue-500/90 backdrop-blur-sm px-3 py-1 rounded-full uppercase tracking-wider">Featured</div>
@@ -253,8 +310,30 @@ export default function Home() {
         )}
 
         <div className={activeTab === "control-center" ? "w-full py-8" : "container mx-auto px-4 py-8"}>
-          {activeTab === "home" && <HomeView engines={engines} />}
-          {activeTab === "control-center" && <ControlCenterView engines={engines} activeTab={controlCenterTab} />}
+          {activeTab === "home" && (
+            <Suspense fallback={
+              <div className="w-full max-w-7xl mx-auto">
+                <div className="animate-pulse space-y-8">
+                  <div className="h-64 bg-zinc-800/50 rounded-lg"></div>
+                  <div className="h-96 bg-zinc-800/50 rounded-lg"></div>
+                </div>
+              </div>
+            }>
+              <HomeView engines={engines} />
+            </Suspense>
+          )}
+          {activeTab === "control-center" && (
+            <Suspense fallback={
+              <div className="w-full py-8">
+                <div className="animate-pulse space-y-8">
+                  <div className="h-64 bg-zinc-800/50 rounded-lg"></div>
+                  <div className="h-96 bg-zinc-800/50 rounded-lg"></div>
+                </div>
+              </div>
+            }>
+              <ControlCenterView engines={engines} activeTab={controlCenterTab} />
+            </Suspense>
+          )}
         </div>
       </div>
     </div>

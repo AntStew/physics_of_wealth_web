@@ -1,6 +1,7 @@
 import { TrendingUp, DollarSign, BarChart3, Wallet } from "lucide-react";
 import { InfoTooltip } from "../../rocketship/components/InfoTooltip";
 import { MetricCard } from "./MetricCard";
+import { formatCurrency } from "@/lib/formatCurrency";
 
 interface MetricsGridProps {
   portfolioGrowth: number;
@@ -29,7 +30,7 @@ export function MetricsGrid({
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       <MetricCard
         title="Total Portfolio Growth"
-        value={`$${portfolioGrowth.toFixed(2)}`}
+        value={formatCurrency(portfolioGrowth)}
         subtitle={`${portfolioGrowthPercent.toFixed(1)}%`}
         icon={<TrendingUp className="w-5 h-5" />}
         borderColor="border-green-500/30"
@@ -43,7 +44,7 @@ export function MetricsGrid({
       
       <MetricCard
         title="S&P 500 Growth"
-        value={`$${sp500Growth.toFixed(2)}`}
+        value={formatCurrency(sp500Growth)}
         subtitle={`${sp500GrowthPercent.toFixed(1)}%`}
         icon={<BarChart3 className="w-5 h-5" />}
         borderColor="border-blue-500/30"
@@ -57,7 +58,7 @@ export function MetricsGrid({
       
       <MetricCard
         title="Total Money Invested"
-        value={`$${totalInvested.toFixed(2)}`}
+        value={formatCurrency(totalInvested)}
         subtitle="INITIAL CAPITAL"
         icon={<Wallet className="w-5 h-5" />}
         borderColor="border-teal-500/30"
@@ -88,7 +89,7 @@ export function MetricsGrid({
         <div className="flex items-center gap-2 mb-1">
           <DollarSign className={`w-5 h-5 ${totalGained >= 0 ? 'text-purple-400' : 'text-red-400'}`} />
           <div className={`text-3xl font-bold font-mono ${totalGained >= 0 ? 'text-purple-400' : 'text-red-400'}`}>
-            ${totalGained.toFixed(2)}
+            {formatCurrency(totalGained)}
           </div>
         </div>
         <div className={`text-xs font-mono ${totalGained >= 0 ? 'text-purple-300/60' : 'text-red-300/60'}`}>

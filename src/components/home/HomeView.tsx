@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { ETFEngine } from "@/lib/types";
 import { TopEnginesByTypeSection } from "./TopEnginesByTypeSection";
 import { EngineTypesSection } from "./EngineTypesSection";
@@ -10,7 +11,7 @@ interface HomeViewProps {
   engines: ETFEngine[];
 }
 
-export function HomeView({ engines }: HomeViewProps) {
+function HomeViewComponent({ engines }: HomeViewProps) {
   return (
     <div className="w-full max-w-7xl mx-auto">
       {/* Definition of each Engine Types */}
@@ -33,4 +34,6 @@ export function HomeView({ engines }: HomeViewProps) {
     </div>
   );
 }
+
+export const HomeView = memo(HomeViewComponent);
 
